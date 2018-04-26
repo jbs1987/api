@@ -5,6 +5,7 @@ import (
     "net/http"
     "fmt"
     "github.com/gorilla/mux"
+    "io/ioutil"
 )
 // Define the type Struct.
 
@@ -42,13 +43,18 @@ func CreateServer(w http.ResponseWriter, req *http.Request) {
 
     //Create the server whith the dates that we pass on the body.
 
-    params := mux.Vars(req)
+    w.Header().Set("Content-Type", "application/json")
+
     var newserver Server
-    _ = json.NewDecoder(req.Body).Decode(&newserver)
+    reader, _ := ioutil.ReadAll(req.Body)
+         json.Unmarshal(reader, &newserver)
+
     servers = append(servers, newserver)
+
     json.NewEncoder(w).Encode(servers)
-    fmt.Println("The server with ID", params["id"], "has been created")
+    fmt.Println("The new server has been created")
 }
+
 func DeleteServer(w http.ResponseWriter, req *http.Request) {
 
     //Delete the server that we pass on header.
@@ -99,3 +105,4 @@ func main() {
 
     //the API is listened a server on the 8080 port.
     log.Fatal(http.ListenAndServe(":8080", router))
+}
