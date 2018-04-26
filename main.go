@@ -41,18 +41,23 @@ func GetAllservers(w http.ResponseWriter, req *http.Request) {
 }
 func CreateServer(w http.ResponseWriter, req *http.Request) {
 
-    //Create the server whith the dates that we pass on the body.
+    //Create the server, give the ID from the header and the other params from the body.
 
     w.Header().Set("Content-Type", "application/json")
+    params := mux.Vars(req)
 
     var newserver Server
+
+    _ = json.NewDecoder(req.Body).Decode(&newserver)
+    newserver.ID = params["id"]
+
     reader, _ := ioutil.ReadAll(req.Body)
          json.Unmarshal(reader, &newserver)
 
     servers = append(servers, newserver)
 
     json.NewEncoder(w).Encode(servers)
-    fmt.Println("The new server has been created")
+    fmt.Println("The server with id", params["id"], "has been created")
 }
 
 func DeleteServer(w http.ResponseWriter, req *http.Request) {
